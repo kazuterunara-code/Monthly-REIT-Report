@@ -1,0 +1,14 @@
+# Claude API
+anthropic>=0.30.0
+
+# Web検索
+tavily-python>=0.3.0
+
+# Google / Gmail API
+google-auth>=2.30.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+google-api-python-client>=2.130.0
+
+# HTTP クライアント（URL取得用）
+requests>=2.31.0
