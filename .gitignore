@@ -1,0 +1,23 @@
+# ── Google OAuth 認証情報（絶対にコミットしないこと）──
+credentials.json
+token.json
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── エディタ ──
+.vscode/
+.idea/
+*.swp
