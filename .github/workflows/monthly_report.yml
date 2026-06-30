@@ -1,0 +1,51 @@
+name: 月次 REIT レポート自動生成
+
+on:
+  # 毎月1日 10:00 JST（= 01:00 UTC）に自動実行
+  schedule:
+    - cron: '0 1 1 * *'
+  # 手動実行も可能（テスト用）
+  workflow_dispatch:
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # ── 1. リポジトリをチェックアウト ──────────────────────────────────────
+      - name: チェックアウト
+        uses: actions/checkout@v4
+
+      # ── 2. Python 環境セットアップ ─────────────────────────────────────────
+      - name: Python 3.11 セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      # ── 3. 依存パッケージインストール ──────────────────────────────────────
+      - name: 依存パッケージインストール
+        run: pip install -r requirements.txt
+
+      # ── 4. Gmail 認証ファイルを Secrets から復元 ───────────────────────────
+      - name: Gmail 認証ファイルを復元
+        run: |
+          echo "${{ secrets.GMAIL_CREDENTIALS }}" | base64 -d > credentials.json
+          echo "${{ secrets.GMAIL_TOKEN }}"       | base64 -d > token.json
+
+      # ── 5. レポート生成スクリプトを実行 ────────────────────────────────────
+      - name: 月次レポートを生成
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TAVILY_API_KEY:    ${{ secrets.TAVILY_API_KEY }}
+        run: python scripts/monthly_reit_report.py
+
+      # ── 6. 生成されたレポートをアーティファクトとして保存（90日間）──────────
+      - name: レポートをアーティファクトとして保存
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monthly-reit-report-${{ github.run_number }}
+          path: reports/
+          retention-days: 90
